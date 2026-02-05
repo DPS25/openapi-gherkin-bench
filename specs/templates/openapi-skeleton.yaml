@@ -1,0 +1,51 @@
+openapi: 3.0.3
+
+info:
+  title: "Benchmarkable SUT - OpenAPI Skeleton"
+  version: "0.0.0"
+
+x-bdd:
+  sut:
+    id: "__SUT_ID__"
+    version: "__SUT_VERSION__"
+
+paths:
+  "__WRITE_PATH__":
+    __WRITE_METHOD__:
+      x-bdd:
+        operation:
+          id: "__WRITE_BDD_OPERATION_ID__"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnyObject"
+            examples:
+
+              {}
+      responses:
+        "200": { description: "OK" }
+
+  "__QUERY_PATH__":
+    __QUERY_METHOD__:
+      x-bdd:
+        operation:
+          id: "__QUERY_BDD_OPERATION_ID__"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnyObject"
+            examples:
+
+              {}
+      responses:
+        "200": { description: "OK" }
+
+components:
+  schemas:
+    AnyObject:
+      type: object
+      additionalProperties: true
