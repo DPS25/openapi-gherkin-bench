@@ -1,13 +1,15 @@
 @universal
-Feature: Universal Benchmark Plan (write + query)
+Feature: Universal Benchmark Plan (intent-driven)
   The runner must remain SUT-agnostic.
-  Health checks are handled internally by the Universal Adapter and are NOT benchmark operations here.
+  This feature describes WHAT should be benchmarked (intent), not HOW a specific SUT performs it.
+  System-specific parameter mapping + request shaping is delegated to the OpenAPI x-bdd metadata
+  and (later) the Gemini integration.
 
   Background:
     Given the universal benchmark base plan is loaded from "specs/benchmarks/universal.yaml"
 
-  Scenario Outline: Universal write + query benchmark - <profile>
-    When I benchmark write operation "<write_operation_id>" and query operation "<query_operation_id>"
+  Scenario Outline: Universal ingest + query benchmark - <profile>
+    When I benchmark a generic "write_then_query" workflow
 
     And I configure runtime:
       | warmup      | <warmup>      |
@@ -15,25 +17,16 @@ Feature: Universal Benchmark Plan (write + query)
       | concurrency | <concurrency> |
       | seed        | <seed>        |
 
-    And I configure write parameters:
-      | batch_size        | <batch_size>        |
-      | parallel_writers  | <parallel_writers>  |
-      | batches           | <batches>           |
-      | write_compression | <write_compression> |
-      | precision         | <precision>         |
-      | point_complexity  | <point_complexity>  |
-      | tag_cardinality   | <tag_cardinality>   |
-      | time_ordering     | <time_ordering>     |
-      | expected_points   | <expected_total_points> |
+    And I describe ingestion intent:
+      | volume | <ingest_volume> |
+      | unit   | <ingest_unit>   |
+      | shape  | <data_shape>    |
+      | order  | <time_order>    |
 
-    And I configure query parameters:
-      | time_range         | <time_range>         |
-      | query_type         | <query_type>         |
-      | result_size        | <result_size>        |
-      | concurrent_clients | <concurrent_clients> |
-      | query_repeats      | <query_repeats>      |
-      | output_format      | <output_format>      |
-      | query_compression  | <query_compression>  |
+    And I describe query intent:
+      | kind       | <query_kind>  |
+      | time_range | <time_range>  |
+      | expectation| <expectation> |
 
     And I configure export:
       | console | <console> |
@@ -47,10 +40,7 @@ Feature: Universal Benchmark Plan (write + query)
 
     @normal
     Examples:
-      | profile | write_operation_id | query_operation_id | warmup | iterations | concurrency | seed | batch_size | parallel_writers | batches | expected_total_points | write_compression | precision | point_complexity | tag_cardinality | time_ordering | time_range | query_type  | result_size | concurrent_clients | query_repeats | output_format | query_compression | console | jsonPath               | effectivePlanPath               |
-      | smoke   | ingest_batch       | query_range        | 10     | 50         | 1           | 42   | 100        | 1                | 10      | 1000                  | none              | ns        | low              | 10              | in_order      | 10s        | filter      | small       | 1                  | 1             | csv           | none              | true    | results/universal.json | results/effective_universal.yml |
-      | average | ingest_batch       | query_range        | 10     | 50         | 1           | 42   | 250        | 2                | 10      | 5000                  | none              | ns        | medium           | 100             | in_order      | 1h         | aggregate   | small       | 2                  | 2             | csv           | gzip              | true    | results/universal.json | results/effective_universal.yml |
-      | stress  | ingest_batch       | query_range        | 10     | 50         | 1           | 42   | 500        | 2                | 20      | 20000                 | none              | ns        | medium           | 250             | in_order      | 6h         | aggregate   | large       | 4                  | 2             | csv           | gzip              | true    | results/universal.json | results/effective_universal.yml |
-      | spike   | ingest_batch       | query_range        | 10     | 50         | 1           | 42   | 250        | 4                | 10      | 10000                 | none              | ns        | medium           | 250             | in_order      | 1h         | filter      | large       | 8                  | 1             | csv           | gzip              | true    | results/universal.json | results/effective_universal.yml |
-      | break   | ingest_batch       | query_range        | 10     | 50         | 1           | 42   | 1000       | 4                | 25      | 100000                | none              | ns        | high             | 500             | in_order      | 1h         | aggregate   | large       | 8                  | 1             | csv           | gzip              | true    | results/universal.json | results/effective_universal.yml |
-      | soak    | ingest_batch       | query_range        | 10     | 50         | 1           | 42   | 100        | 1                | 300     | 30000                 | none              | ns        | low              | 100             | in_order      | 72h        | filter      | small       | 2                  | 5             | csv           | none              | true    | results/universal.json | results/effective_universal.yml | 
+      | profile | warmup | iterations | concurrency | seed | ingest_volume | ingest_unit | data_shape | time_order | query_kind | time_range | expectation | console | jsonPath               | effectivePlanPath               |
+      | smoke   | 5      | 20         | 1           | 42   | 10            | MB          | simple     | in_order   | range      | 10m        | non_empty   | true    | results/universal.json | results/effective_universal.yml |
+      | avg     | 10     | 50         | 2           | 42   | 250           | MB          | medium     | in_order   | aggregate  | 1h         | non_empty   | true    | results/universal.json | results/effective_universal.yml |
+      | stress  | 10     | 80         | 4           | 42   | 1             | GB          | medium     | in_order   | aggregate  | 6h         | non_empty   | true    | results/universal.json | results/effective_universal.yml |

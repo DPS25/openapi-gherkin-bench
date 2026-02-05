@@ -17,15 +17,26 @@ run:
   seed: null
 
 targets:
+  workflow: null
   write_operation_id: null
   query_operation_id: null
-
 
 benchmarks:
   write:
     params: {}   
+
+    intent:
+      volume: null
+      unit: null
+      shape: null
+      order: null
+
   query:
-    params: {}  
+    params: {}   
+    intent:
+      kind: null
+      time_range: null
+      expectation: null
 
 export:
   console: null
