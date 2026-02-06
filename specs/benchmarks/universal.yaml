@@ -1,0 +1,47 @@
+version: 1
+
+meta:
+  name: universal
+  description: >
+    Universal benchmark plan interface.
+    Values are injected exclusively by Behave from .feature Scenario Outline parameters.
+    This plan is then consumed by plan_runner and Universal Adapter (UA).
+    Health checks are UA-internal and not represented here.
+
+env: {}
+
+run:
+  warmup: null
+  iterations: null
+  concurrency: null
+  seed: null
+
+targets:
+  workflow: null
+  write_operation_id: null
+  query_operation_id: null
+
+benchmarks:
+  write:
+    params: {}   
+
+    intent:
+      volume: null
+      unit: null
+      shape: null
+      order: null
+
+  query:
+    params: {}   
+    intent:
+      kind: null
+      time_range: null
+      expectation: null
+
+export:
+  console: null
+  json:
+    enabled: null
+    path: null
+  influx:
+    enabled: null
