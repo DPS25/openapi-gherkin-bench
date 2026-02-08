@@ -1,0 +1,3 @@
+[submodule "vendor/influx-openapi"]
+	path = vendor/influx-openapi
+	url = https://github.com/influxdata/openapi.git
