@@ -45,6 +45,7 @@ ln -sfn ../services/my-new-service features/steps
 Now that the link is active, Behave will "see" the Python steps for your new service as if they were natively in the `features/steps` folder.
 
 ```bash
+export ENV_NAME=<ENV-NAME>  && nix develop
 behave --tags=@ingestion
 
 ```
