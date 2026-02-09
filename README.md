@@ -1,3 +1,96 @@
+
+## 🚀 Adding & Activating a Service
+
+Follow these steps to integrate a new service while keeping the project structure clean.
+
+### 1. Register the Service
+
+Add the service path and the specific `operationId` mappings to your root `mapping.yaml`.
+
+```yaml
+# mapping.yaml
+my-new-service:
+  spec_path: "vendor/my-service/openapi.yaml"
+  operations:
+    write: 
+      operationId: "IngestMetrics"
+
+```
+
+### 2. Generate the Step File
+
+Run the `generate.py` script. Based on our latest version, this will extract only the relevant portion of the OpenAPI spec and save the Python code to a dedicated service folder.
+
+```bash
+python generate.py write my-new-service
+
+```
+
+* **Output Location:** `services/my-new-service/write.py`
+
+### 3. Activate the Service (The `ln` Step)
+
+Because **Behave** strictly looks for a folder named `steps` inside your `features` directory, you must point that folder to your new service's code.
+
+```bash
+# Link features/steps to your specific service library
+ln -sfn ../services/my-new-service features/steps
+
+```
+
+> **Tip:** The `../services/...` path is relative to the `features/` directory where the link sits.
+
+### 4. Run the Benchmark
+
+Now that the link is active, Behave will "see" the Python steps for your new service as if they were natively in the `features/steps` folder.
+
+```bash
+export ENV_NAME=<ENV-NAME>  && nix develop
+behave --tags=@ingestion
+
+```
+
+---
+
+## 📂 Project Structure Overview
+
+After following this workflow, your directory tree looks like this:
+
+```text
+.
+├── mapping.yaml
+├── generate.py
+├── features/
+│   ├── write.feature
+│   └── steps              # 🔗 SYMLINK -> ../services/my-new-service
+├── services/
+│   ├── influx-openapi/
+│   │   └── write.py       # (Inactive)
+│   └── my-new-service/
+│       └── write.py       # (Active via link)
+└── vendor/
+    └── my-service/
+        └── openapi.yaml
+
+```
+
+---
+
+## 🛠 Switching Services
+
+To switch from `my-new-service` back to `influx-openapi`, you only need to run the `ln` command again:
+
+```bash
+# Switch back to InfluxDB
+ln -sfn ../services/influx-openapi features/steps
+
+# Verify the link
+ls -l features/steps
+
+```
+
+Would you like me to provide a **shell alias** or a tiny **`activate.sh`** script that you can use to switch between services even faster (e.g., `./activate.sh influx-openapi`)?
+
 ## Universal Benchmark Flow
 
 ```mermaid
@@ -67,3 +160,8 @@ flowchart TD
 
   ENV -. controles .-> FCT
   ENV -. Auth/URL .-> UA
+```
+
+
+
+

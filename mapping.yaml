@@ -1,0 +1,9 @@
+influx-openapi:
+  spec_path: "vendor/influx-openapi/contracts/oss.yml"
+  operations:
+    write:
+      operationId: "PostWrite"
+    query:
+      operationId: "PostQuery"
+    delete:
+      operationId: "PostDelete"
