@@ -21,7 +21,15 @@ def extract_minimal_spec(spec_path, target_op_id):
 
     # 1. Find the operation
     for path, methods in full_spec.get("paths", {}).items():
+        # Defensive: some specs can be malformed, ensure path item is a dict
+        if not isinstance(methods, dict):
+            continue
+
         for method, details in methods.items():
+            # Skip non-operation keys like "parameters" (list) or other metadata
+            if not isinstance(details, dict):
+                continue
+
             if details.get("operationId") == target_op_id:
                 minimal_spec["paths"][path] = {method: details}
                 found = True
@@ -33,6 +41,7 @@ def extract_minimal_spec(spec_path, target_op_id):
                     if f"#/components/schemas/{schema_name}" in details_str:
                         minimal_spec["components"]["schemas"][schema_name] = schema_body
                 break
+
 
     if not found:
         print(f"⚠️ Warning: operationId '{target_op_id}' not found in spec. Sending small sample instead.")

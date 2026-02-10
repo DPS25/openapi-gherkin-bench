@@ -1,0 +1,115 @@
+openapi: 3.0.3
+info:
+  title: Prometheus HTTP API (benchmark subset)
+  version: "0.1.0"
+  description: >
+    Minimal OpenAPI spec used for generating Behave step definitions via generate.py + Gemini.
+    Contains only endpoints required by this benchmark suite (write/query/delete).
+
+servers:
+  - url: http://localhost:9090
+    description: Default local Prometheus
+
+paths:
+  /api/v1/write:
+    post:
+      operationId: IngestMetrics
+      summary: Remote write receiver
+      description: >
+        Requires Prometheus flag: --web.enable-remote-write-receiver
+        Payload is application/x-protobuf (Remote Write WriteRequest) typically Snappy-compressed.
+      requestBody:
+        required: true
+        content:
+          application/x-protobuf:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: OK
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request (invalid remote write payload)
+        "404":
+          description: Not Found (receiver disabled)
+
+  /api/v1/query_range:
+    get:
+      operationId: QueryRange
+      summary: PromQL range query
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+          description: PromQL expression
+        - in: query
+          name: start
+          required: true
+          schema:
+            type: string
+          description: RFC3339 or unix timestamp (float seconds)
+        - in: query
+          name: end
+          required: true
+          schema:
+            type: string
+          description: RFC3339 or unix timestamp (float seconds)
+        - in: query
+          name: step
+          required: true
+          schema:
+            type: string
+          description: Query resolution step width (duration or float seconds)
+        - in: query
+          name: timeout
+          required: false
+          schema:
+            type: string
+          description: Optional evaluation timeout duration
+      responses:
+        "200":
+          description: OK
+
+  /api/v1/admin/tsdb/delete_series:
+    post:
+      operationId: DeleteSeries
+      summary: Delete series by matchers
+      description: >
+        Requires Prometheus flag: --web.enable-admin-api
+        match[] is a repeated query param, each element is a series selector.
+      parameters:
+        - in: query
+          name: match[]
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          description: One or more series matchers (e.g. up, http_requests_total{job="api"})
+        - in: query
+          name: start
+          required: false
+          schema:
+            type: string
+          description: Optional start time bound (RFC3339 or unix timestamp)
+        - in: query
+          name: end
+          required: false
+          schema:
+            type: string
+          description: Optional end time bound (RFC3339 or unix timestamp)
+      responses:
+        "204":
+          description: No Content
+        "200":
+          description: OK
+        "403":
+          description: Forbidden (admin api disabled)
+        "404":
+          description: Not Found

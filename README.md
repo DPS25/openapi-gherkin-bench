@@ -75,6 +75,49 @@ After following this workflow, your directory tree looks like this:
 ```
 
 ---
+## Implemented services 
+
+### InfluxDB
+
+- **What does it do?**
+  - Time-series database (TSDB) for storing and querying metrics/events via a well-defined HTTP API.
+
+- **Why did we choose it?**
+  - Baseline TSDB in our benchmark suite (clear ingest/query/delete semantics).
+  - Comes with an upstream OpenAPI contract repo vendored as a submodule (`vendor/influx-openapi/...`), which fits our `generate.py + Gemini` workflow.
+
+- **Potential problems**
+
+### Prometheus (Server)
+
+- **What does it do?**
+  - Metrics/monitoring TSDB with PromQL query API; can accept data via Remote Write (if enabled).
+
+- **Why did we choose it?**
+  - Widely used OSS standard → expands our TSDB service range.
+  - Strong “read/query” benchmarking via `query_range` (concurrency, p95/p99, etc.).
+
+- **Potential problems**
+  - No upstream, versioned OpenAPI contract like InfluxDB → we maintain a small “benchmark subset” OpenAPI spec to keep the Gemini generation flow working.
+  - Write endpoint is **Remote Write (protobuf + snappy)**, not plain text; invalid payloads can produce `400` and skew availability/latency.
+
+
+### Alertmanager
+
+- **What does it do?**
+  - Alert processing service (dedup/group/routing) with an HTTP API for alerts and silences.
+
+- **Why did we choose it?**
+  - Has an upstream OpenAPI/Swagger spec in the official repo → we can vendor it as a submodule (same pattern as Influx).
+  - Adds another well-defined API SUT to validate our benchmark pipeline (availability/latency/concurrency).
+
+- **Potential problems**
+  - Not a TSDB: “query” is alert-state reads, not time-series queries → not directly comparable to TSDB query benchmarks.
+  - “Delete” is management/control-plane (e.g., silences), not time-series data deletion.
+  - Realism depends on having enough generated alerts/silences; otherwise endpoints may return near-empty results.
+
+
+---
 
 ## 🛠 Switching Services
 
