@@ -1,3 +1,6 @@
 [submodule "vendor/influx-openapi"]
 	path = vendor/influx-openapi
 	url = https://github.com/influxdata/openapi.git
+[submodule "vendor/alertmanager"]
+	path = vendor/alertmanager
+	url = https://github.com/prometheus/alertmanager.git
