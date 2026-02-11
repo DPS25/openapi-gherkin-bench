@@ -4,3 +4,6 @@
 [submodule "vendor/alertmanager"]
 	path = vendor/alertmanager
 	url = https://github.com/prometheus/alertmanager.git
+[submodule "vendor/prometheus"]
+	path = vendor/prometheus
+	url = https://github.com/prometheus/prometheus.git
