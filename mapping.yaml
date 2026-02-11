@@ -7,3 +7,23 @@ influx-openapi:
       operationId: "PostQuery"
     delete:
       operationId: "PostDelete"
+
+prometheus:
+  spec_path: "vendor/prometheus/web/api/v1/testdata/openapi_3.2_golden.yaml"
+  operations:
+    write:
+      operationId: "remoteWrite"
+    query:
+      operationId: "query-range"
+    delete:
+      operationId: "deleteSeriesPost"
+
+alertmanager:
+  spec_path: "vendor/alertmanager/api/v2/openapi.yaml"
+  operations:
+    write:
+      operationId: "postAlerts"
+    query:
+      operationId: "getAlerts"
+    delete:
+      operationId: "deleteSilence"
