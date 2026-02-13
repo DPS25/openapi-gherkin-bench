@@ -7,3 +7,13 @@ influx-openapi:
       operationId: "PostQuery"
     delete:
       operationId: "PostDelete"
+
+directus:
+  spec_path: "vendor/directus/dist/oas.yaml"
+  operations:
+    write:
+      operationId: "createItems"
+    query:
+      operationId: "getCollectionItems"
+    delete:
+      operationId: "deleteItems"
