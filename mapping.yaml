@@ -9,7 +9,7 @@ influx-openapi:
       operationId: "PostDelete"
 
 directus:
-  spec_path: "vendor/directus/dist/oas.yaml"
+  spec_path: "specs/directus/oas.yaml"
   operations:
     write:
       operationId: "createItems"
